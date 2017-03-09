@@ -1,0 +1,4 @@
+# The Game of Life
+A project for the Free Code Camp Data Visualization certificate.
+
+This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
