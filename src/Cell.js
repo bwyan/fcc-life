@@ -3,7 +3,7 @@ import React from 'react';
 class Cell extends React.Component {
 	render() {
 		return(
-			<td>😀</td>
+			<td>{this.props.isAlive ? '😀' : '☠️'}</td>
 		)
 	}
 }
