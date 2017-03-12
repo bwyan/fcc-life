@@ -12,6 +12,8 @@ class App extends Component {
 
     this.setGridDimensions = this.setGridDimensions.bind(this);
     this.toggleIsAliveState = this.toggleIsAliveState.bind(this);
+    this.isAlive = this.isAlive.bind(this);
+    this.setCellToNextStageOfLife = this.setCellToNextStageOfLife.bind(this);
   }
 
   setGridDimensions(x, y) {
@@ -36,6 +38,28 @@ class App extends Component {
     })
   }
 
+  //may be redundant but keep for now (depends on algo for the game rules)
+  // makeAlive(row, col) {
+  //   if (aliveCells[row].indexOf(col) === -1) { //check to make sure cells don't get added more than once
+  //     aliveCells[row].push(col);  
+  //   }
+  // }
+
+  // //may be redundant but keep for now (depending on algo for the game rules)
+  // makeDead(row, col) {
+  //   if (!aliveCells[row].indexOf(col) === -1) {
+  //     aliveCells[row].splice(aliveCells[row].indexOf(col), 1);
+  //   }
+  // }
+
+  isAlive(row, col) {
+    const aliveCells = this.state.aliveCells;
+
+    if (row > aliveCells.length) return false;
+
+    return (aliveCells[row].indexOf(col) === -1 ? false : true);
+  }
+
   toggleIsAliveState(row, col) {
     //make the variable easier to read
     let aliveCells = this.state.aliveCells;
@@ -54,6 +78,39 @@ class App extends Component {
     this.setState({
       aliveCells: aliveCells
     })
+  }
+
+  setCellToNextStageOfLife(row, col) {
+    const neighbors = [
+      [row - 1, col - 1], [row -1, col], [row - 1, col + 1],
+      [row, col - 1], [row, col + 1],
+      [row + 1, col -1 ], [row + 1, col], [row + 1, col + 1]
+    ];
+
+    let aliveNeighborsCount = 0;
+
+    if(this.isAlive(row, col)) {
+      for (var i = neighbors.length - 1; i >= 0; i--) {
+        const nr = Number(neighbors[i][0]);
+        const nc = Number(neighbors[i][1]);
+
+        if (this.isAlive(nr, nc)) {
+          aliveNeighborsCount++;
+
+          if (aliveNeighborsCount >= 4) {
+            console.log('cell dies');
+            break;
+          } else if (aliveNeighborsCount === 2 || aliveNeighborsCount === 3) {
+            console.log('cdll stays alive');
+            break;
+          }
+        } else if (!this.isAlive(nr, nc)) {
+          aliveNeighborsCount++;
+          //
+        }
+      }
+    }
+    
   }
 
   componentWillMount() {
