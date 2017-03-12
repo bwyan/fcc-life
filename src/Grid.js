@@ -6,7 +6,7 @@ class Grid extends React.Component {
 		let rows = [];
 
 		for (var i = 0; i < this.props.rows; i++) {
-			rows.push(<Row className={`row row-${i}`} key={i} columns={this.props.columns} aliveCells={this.props.aliveCells[i]}/>)
+			rows.push(<Row className={`row row-${i}`} key={i} rowNumber={i} columns={this.props.columns} aliveCells={this.props.aliveCells[i]} toggleIsAliveState={this.props.toggleIsAliveState}/>)
 		}
 
 		return (
