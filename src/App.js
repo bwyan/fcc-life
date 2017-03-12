@@ -41,7 +41,7 @@ class App extends Component {
     let aliveCells = this.state.aliveCells;
 
     //prevent adding cells that are beyond the grid
-    if (row > this.state.rows || col > this.state.columns) return;
+    if (row > this.state.rows || col > this.state.columns || row < 0 || col < 0) return;
 
     //add or remove 
     if (aliveCells[row].indexOf(col) === -1) { //if cell isn't in aliveCells (is dead)
