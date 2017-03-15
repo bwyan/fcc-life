@@ -55,7 +55,7 @@ class App extends Component {
   isAlive(row, col) {
     const aliveCells = this.state.aliveCells;
 
-    if (row > aliveCells.length) return false;
+    if (row < 0 || row > this.state.rows -1  || col < 0 || col > this.state.columns - 1) return false;
 
     return (aliveCells[row].indexOf(col) === -1 ? false : true);
   }
@@ -80,6 +80,7 @@ class App extends Component {
     })
   }
 
+  //START HERE (function doesn't work. Always says that cell dies.)
   setCellToNextStageOfLife(row, col) {
     const neighbors = [
       [row - 1, col - 1], [row -1, col], [row - 1, col + 1],
@@ -89,36 +90,69 @@ class App extends Component {
 
     let aliveNeighborsCount = 0;
 
-    if(this.isAlive(row, col)) {
-      for (var i = neighbors.length - 1; i >= 0; i--) {
+    if(this.isAlive(row, col)) { //if the cell that we're testing is alive, then apply the rules for alive cells.
+      for (let i = 0; i < 8; i++) { //test each neighbor cell.
+ 
         const nr = Number(neighbors[i][0]);
         const nc = Number(neighbors[i][1]);
 
-        if (this.isAlive(nr, nc)) {
-          aliveNeighborsCount++;
-
-          if (aliveNeighborsCount >= 4) {
-            console.log('cell dies');
-            break;
-          } else if (aliveNeighborsCount === 2 || aliveNeighborsCount === 3) {
-            console.log('cdll stays alive');
+        if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…
+          console.log('neighbor is alive');
+          aliveNeighborsCount++; //increment the count.
+          console.log(aliveNeighborsCount);
+          
+          if (aliveNeighborsCount >= 4) { //once the count reaches 4, we can stop because the rules are the same for 4–8 living neighbors.
+            console.log('cell dies of overcrowding');
             break;
           }
-        } else if (!this.isAlive(nr, nc)) {
-          aliveNeighborsCount++;
-          //
+        } //end of if neighbor cell is alive.
+      } //end of for loop
+
+      if (aliveNeighborsCount === 0 || aliveNeighborsCount === 1) {
+        this.toggleIsAliveState(row, col); //cell dies
+      }
+
+    } else if (!this.isAlive(row,col)) { //if the cell that we're testing is dead, apply the rules for a dead cell.
+      console.log('Apply the rules for a dead cell')
+      for (let i = 0; i < 8; i++) { //test each neighbor cell.
+ 
+        const nr = Number(neighbors[i][0]);
+        const nc = Number(neighbors[i][1]);
+
+        if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…
+          console.log('neighbor is alive');
+          aliveNeighborsCount++; //increment the count.        
         }
       }
+
+      if (aliveNeighborsCount === 3) { //once the count reaches 4, we can stop because the rules are the same for 4–8 living neighbors.
+        console.log('a cell is born!');
+        this.toggleIsAliveState(row, col);
+      }
+    } 
+  }
+
+  setGameToNextStageOfLife() {
+    for (let r = 0; r < this.state.rows; r++) {
+      for (let c = 0; c < this.state.columns; c++) {
+        this.setCellToNextStageOfLife(r, c);
+      }
     }
-    
+
+    //TODO: add routine to push updates and clear cellsToBeUpdated.
   }
 
   componentWillMount() {
     this.setState({
       rows: 3,
       columns: 20,
-      aliveCells: [ [ 0, 5, 20, 1 ], [ 2, 10 ], [ 6, 3, 1 ] ]
+      aliveCells: [ [ 0, 5, 20, 1 ], [ 2, 10 ], [ 6, 3, 1 ] ],
+      cellsToBeUpdated: []
     })
+  }
+
+  componentDidMount() { //TODO: get better starting data for aliveCells and remove this hack.
+    this.setGridDimensions(30, 30);
   }
 
   render() {
