@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 
 //components
 import Grid from './Grid';
+import GameControls from './GameControls';
 
 //styles
 import './App.scss';
@@ -14,6 +15,7 @@ class App extends Component {
     this.toggleIsAliveState = this.toggleIsAliveState.bind(this);
     this.isAlive = this.isAlive.bind(this);
     this.setCellToNextStageOfLife = this.setCellToNextStageOfLife.bind(this);
+    this.addToCellsToBeUpdated = this.addToCellsToBeUpdated.bind(this);
   }
 
   setGridDimensions(x, y) {
@@ -68,9 +70,9 @@ class App extends Component {
     if (row > this.state.rows || col > this.state.columns || row < 0 || col < 0) return;
 
     //add or remove 
-    if (aliveCells[row].indexOf(col) === -1) { //if cell isn't in aliveCells (is dead)
+    if (!this.isAlive(row, col)) { //if cell isn't in aliveCells (is dead)
       aliveCells[row].push(col); //add it
-    } else { //if cell *is* in aliveCells (is alive)
+    } else {
       aliveCells[row].splice(aliveCells[row].indexOf(col), 1); //remove it
     }
 
@@ -80,7 +82,18 @@ class App extends Component {
     })
   }
 
-  //START HERE (function doesn't work. Always says that cell dies.)
+  
+  addToCellsToBeUpdated(row, col) {
+    const cellsToBeUpdated = this.state.cellsToBeUpdated;
+
+    cellsToBeUpdated.push([row, col]);
+
+    this.setState({
+      cellsToBeUpdated: cellsToBeUpdated
+    })
+  }
+
+
   setCellToNextStageOfLife(row, col) {
     const neighbors = [
       [row - 1, col - 1], [row -1, col], [row - 1, col + 1],
@@ -90,44 +103,38 @@ class App extends Component {
 
     let aliveNeighborsCount = 0;
 
-    if(this.isAlive(row, col)) { //if the cell that we're testing is alive, then apply the rules for alive cells.
+    if(this.isAlive(row, col)) { //RULES FOR ALIVE CELLS
       for (let i = 0; i < 8; i++) { //test each neighbor cell.
  
         const nr = Number(neighbors[i][0]);
         const nc = Number(neighbors[i][1]);
 
-        if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…
-          console.log('neighbor is alive');
+        if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…          
           aliveNeighborsCount++; //increment the count.
-          console.log(aliveNeighborsCount);
           
           if (aliveNeighborsCount >= 4) { //once the count reaches 4, we can stop because the rules are the same for 4–8 living neighbors.
-            console.log('cell dies of overcrowding');
             break;
           }
-        } //end of if neighbor cell is alive.
-      } //end of for loop
-
-      if (aliveNeighborsCount === 0 || aliveNeighborsCount === 1) {
-        this.toggleIsAliveState(row, col); //cell dies
+        }
       }
 
-    } else if (!this.isAlive(row,col)) { //if the cell that we're testing is dead, apply the rules for a dead cell.
-      console.log('Apply the rules for a dead cell')
+      if (aliveNeighborsCount === 0 || aliveNeighborsCount === 1) {
+        this.addToCellsToBeUpdated(row, col);
+      }
+
+    } else if (!this.isAlive(row,col)) { //RULES FOR DEAD CELLS
       for (let i = 0; i < 8; i++) { //test each neighbor cell.
  
         const nr = Number(neighbors[i][0]);
         const nc = Number(neighbors[i][1]);
 
         if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…
-          console.log('neighbor is alive');
           aliveNeighborsCount++; //increment the count.        
         }
       }
 
       if (aliveNeighborsCount === 3) { //once the count reaches 4, we can stop because the rules are the same for 4–8 living neighbors.
-        console.log('a cell is born!');
-        this.toggleIsAliveState(row, col);
+        this.addToCellsToBeUpdated(row, col);
       }
     } 
   }
@@ -139,7 +146,18 @@ class App extends Component {
       }
     }
 
-    //TODO: add routine to push updates and clear cellsToBeUpdated.
+    let cellsToBeUpdated = this.state.cellsToBeUpdated;
+
+    cellsToBeUpdated.forEach(cell => {
+      this.toggleIsAliveState(cell[0], cell[1]);
+    });
+
+    cellsToBeUpdated = [];
+    this.setState({
+      cellsToBeUpdated: cellsToBeUpdated
+    })
+
+    //if(this.state.gameIsRunning) {this.setGameToNextStageOfLife()} (need something like this to keep game running)
   }
 
   componentWillMount() {
@@ -147,12 +165,13 @@ class App extends Component {
       rows: 3,
       columns: 20,
       aliveCells: [ [ 0, 5, 20, 1 ], [ 2, 10 ], [ 6, 3, 1 ] ],
-      cellsToBeUpdated: []
+      cellsToBeUpdated: [],
+      gameIsRunning: true
     })
   }
 
   componentDidMount() { //TODO: get better starting data for aliveCells and remove this hack.
-    this.setGridDimensions(30, 30);
+    this.setGridDimensions(20, 20);
   }
 
   render() {
@@ -160,7 +179,7 @@ class App extends Component {
       <div>
         <h1>The Game of Life</h1>
         <div className="game">
-          <div className="game--controls"></div>
+          <GameControls />
           <Grid rows={this.state.rows} columns={this.state.columns} aliveCells={this.state.aliveCells} toggleIsAliveState={this.toggleIsAliveState}/>
         </div>
       </div>
