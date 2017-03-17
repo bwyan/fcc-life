@@ -4,6 +4,9 @@ import React, {Component} from 'react';
 import Grid from './Grid';
 import GameControls from './GameControls';
 
+//constants
+import neighbors from './neighbors';
+
 //styles
 import './App.scss';
 
@@ -55,11 +58,9 @@ class App extends Component {
   // }
 
   isAlive(row, col) {
-    const aliveCells = this.state.aliveCells;
+    if (row < 0 || row > this.state.rows -1  || col < 0 || col > this.state.columns - 1) return false;//TODO: move this check into the game function
 
-    if (row < 0 || row > this.state.rows -1  || col < 0 || col > this.state.columns - 1) return false;
-
-    return (aliveCells[row].indexOf(col) === -1 ? false : true);
+    return this.state.aliveCells[row].includes(col);
   }
 
   toggleIsAliveState(row, col) {
@@ -95,19 +96,13 @@ class App extends Component {
 
 
   setCellToNextStageOfLife(row, col) {
-    const neighbors = [
-      [row - 1, col - 1], [row -1, col], [row - 1, col + 1],
-      [row, col - 1], [row, col + 1],
-      [row + 1, col -1 ], [row + 1, col], [row + 1, col + 1]
-    ];
-
     let aliveNeighborsCount = 0;
 
     if(this.isAlive(row, col)) { //RULES FOR ALIVE CELLS
       for (let i = 0; i < 8; i++) { //test each neighbor cell.
  
-        const nr = Number(neighbors[i][0]);
-        const nc = Number(neighbors[i][1]);
+        const nr = Number(neighbors[i][0]) + row;
+        const nc = Number(neighbors[i][1]) + col;
 
         if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…          
           aliveNeighborsCount++; //increment the count.
@@ -125,15 +120,18 @@ class App extends Component {
     } else if (!this.isAlive(row,col)) { //RULES FOR DEAD CELLS
       for (let i = 0; i < 8; i++) { //test each neighbor cell.
  
-        const nr = Number(neighbors[i][0]);
-        const nc = Number(neighbors[i][1]);
+        const nr = Number(neighbors[i][0]) + row;
+        const nc = Number(neighbors[i][1]) + col;
 
         if (this.isAlive(nr, nc)) { //if the neighbor cell is alive…
-          aliveNeighborsCount++; //increment the count.        
+          aliveNeighborsCount++; //increment the count.
+          
+          if (aliveNeighborsCount > 3) {
+            break;
+          }      
         }
       }
-
-      if (aliveNeighborsCount === 3) { //once the count reaches 4, we can stop because the rules are the same for 4–8 living neighbors.
+      if (aliveNeighborsCount === 3) {//cells with three neighbors come to life
         this.addToCellsToBeUpdated(row, col);
       }
     } 
@@ -164,7 +162,7 @@ class App extends Component {
     this.setState({
       rows: 3,
       columns: 20,
-      aliveCells: [ [ 0, 5, 20, 1 ], [ 2, 10 ], [ 6, 3, 1 ] ],
+      aliveCells: [ [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], []],
       cellsToBeUpdated: [],
       gameIsRunning: true
     })
