@@ -15,6 +15,8 @@ class App extends Component {
     super();
 
     this.setGridDimensions = this.setGridDimensions.bind(this);
+    this.toggleGameState = this.toggleGameState.bind(this);
+    this.clearGrid = this.clearGrid.bind(this);
     this.toggleIsAliveState = this.toggleIsAliveState.bind(this);
     this.isAlive = this.isAlive.bind(this);
     this.setCellToNextStageOfLife = this.setCellToNextStageOfLife.bind(this);
@@ -46,7 +48,36 @@ class App extends Component {
     })
   }
 
+  toggleGameState() {
+    let gameIsRunning = this.state.gameIsRunning ? false : true;
+    
+    this.setState({
+      gameIsRunning
+    })
 
+    if(gameIsRunning) {
+      var self = this;
+      var gameInProgress = setInterval(function(){
+        self.setGameToNextStageOfLife();
+      }, 40);
+
+      this.setState({gameInProgress});
+
+      // this.setGameToNextStageOfLife();
+    } else {
+      clearInterval(this.state.gameInProgress);
+    }
+  }
+
+  clearGrid() {
+    let aliveCells = [];
+
+    for (var i = 0; i < this.state.rows; i++) {aliveCells.push([])}
+
+    this.setState({
+      aliveCells
+    })
+  }
 
   isAlive(row, col) {
     if (row < 0 || row > this.state.rows -1  || col < 0 || col > this.state.columns - 1) return false;//TODO: remove this once we have different rules for edge and corner cells.
@@ -74,7 +105,6 @@ class App extends Component {
     })
   }
 
-  
   addTocellsToToggle(row, col) {
     const cellsToToggle = this.state.cellsToToggle;
 
@@ -157,6 +187,7 @@ class App extends Component {
   }
 
   setGameToNextStageOfLife() {
+    console.log('evolution now!');
     for (let r = 0; r < this.state.rows; r++) {
       for (let c = 0; c < this.state.columns; c++) {
         this.setCellToNextStageOfLife(r, c);
@@ -181,8 +212,6 @@ class App extends Component {
       cellsToMakeAlive: [],
       cellsToMakeDead: []
     })
-
-    //if(this.state.gameIsRunning) {this.setGameToNextStageOfLife()} (need something like this to keep game running)
   }
 
   componentWillMount() {
@@ -192,8 +221,8 @@ class App extends Component {
       aliveCells: [ [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], []],
       cellsToMakeAlive: [],
       cellsToMakeDead: [],
-      gameIsRunning: true
-    })
+      gameIsRunning: false
+    });
   }
 
   componentDidMount() { //TODO: get better starting data for aliveCells and remove this hack.
@@ -205,7 +234,12 @@ class App extends Component {
       <div>
         <h1>The Game of Life</h1>
         <div className="game">
-          <GameControls setGameToNextStageOfLife={this.setGameToNextStageOfLife}/>
+          <GameControls
+            setGameToNextStageOfLife={this.setGameToNextStageOfLife}
+            gameIsRunning={this.state.gameIsRunning}
+            clearGrid={this.clearGrid}
+            toggleGameState={this.toggleGameState}
+          />
           <Grid rows={this.state.rows} columns={this.state.columns} aliveCells={this.state.aliveCells} toggleIsAliveState={this.toggleIsAliveState}/>
         </div>
       </div>

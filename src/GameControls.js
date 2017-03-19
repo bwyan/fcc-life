@@ -7,9 +7,8 @@ class GameControls extends React.Component {
 	  return( 
 	    <div className="game--controls">
 	      <button onClick={this.props.setGameToNextStageOfLife}>DEV: next</button>
-	      <button>start</button>	
-	      <button>stop</button>
-	      <button>clear</button>
+	      <button onClick={this.props.toggleGameState}>{this.props.gameIsRunning ? 'Stop' : 'Start'}</button>
+	      <button onClick={this.props.clearGrid}>Clear the Board</button>
 	      <label>Rows<input type="text" /></label>
 	      <label>Columns<input type="text" /></label>
 	    </div>			
