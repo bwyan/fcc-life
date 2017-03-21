@@ -49,17 +49,21 @@ class App extends Component {
   }
 
   toggleGameState() {
-    let gameIsRunning = this.state.gameIsRunning ? false : true;
+    const gameIsRunning = this.state.gameIsRunning ? false : true;
     
     this.setState({
       gameIsRunning
     })
 
     if(gameIsRunning) {
-      var self = this;
-      var gameInProgress = setInterval(function(){
-        self.setGameToNextStageOfLife();
-      }, 40);
+      // const self = this;// only needed when calling setGameToNextStageOfLife() below;
+      const nextButton = document.getElementById('next-button');
+
+      let gameInProgress = setInterval(function(){
+        console.log('next generation');
+        nextButton.click(); //this works with just about setInterval speed.
+        // self.setGameToNextStageOfLife(); //this doesn't work with setInterval faster than 350 ms.
+      }, 250);
 
       this.setState({gameInProgress});
 
@@ -187,8 +191,7 @@ class App extends Component {
   }
 
   setGameToNextStageOfLife() {
-    console.log('evolution now!');
-    for (let r = 0; r < this.state.rows; r++) {
+      for (let r = 0; r < this.state.rows; r++) {
       for (let c = 0; c < this.state.columns; c++) {
         this.setCellToNextStageOfLife(r, c);
       }
@@ -197,6 +200,9 @@ class App extends Component {
     let cellsToMakeDead = this.state.cellsToMakeDead;
     let cellsToMakeAlive = this.state.cellsToMakeAlive;
     let aliveCells = this.state.aliveCells;
+    let generation = this.state.generation;
+
+    generation++;
 
     cellsToMakeAlive.forEach(cell => {
       aliveCells[cell[0]].push(cell[1]);
@@ -208,7 +214,8 @@ class App extends Component {
     });
 
     this.setState({
-      aliveCells: aliveCells,
+      generation,
+      aliveCells,
       cellsToMakeAlive: [],
       cellsToMakeDead: []
     })
@@ -219,6 +226,7 @@ class App extends Component {
       rows: 3,
       columns: 20,
       aliveCells: [ [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], []],
+      generation: 0,
       cellsToMakeAlive: [],
       cellsToMakeDead: [],
       gameIsRunning: false
@@ -240,6 +248,7 @@ class App extends Component {
             clearGrid={this.clearGrid}
             toggleGameState={this.toggleGameState}
           />
+          <p>Generations: {this.state.generation}</p>
           <Grid rows={this.state.rows} columns={this.state.columns} aliveCells={this.state.aliveCells} toggleIsAliveState={this.toggleIsAliveState}/>
         </div>
       </div>
