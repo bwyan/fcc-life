@@ -60,7 +60,6 @@ class App extends Component {
       const nextButton = document.getElementById('next-button');
 
       let gameInProgress = setInterval(function(){
-        console.log('next generation');
         nextButton.click(); //this works with just about setInterval speed.
         // self.setGameToNextStageOfLife(); //this doesn't work with setInterval faster than 350 ms.
       }, 250);
@@ -79,7 +78,8 @@ class App extends Component {
     for (var i = 0; i < this.state.rows; i++) {aliveCells.push([])}
 
     this.setState({
-      aliveCells
+      aliveCells,
+      generation: 0
     })
   }
 
@@ -223,9 +223,9 @@ class App extends Component {
 
   componentWillMount() {
     this.setState({
-      rows: 3,
+      rows: 20,
       columns: 20,
-      aliveCells: [ [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], [], [1, 5, 10, 20], [1, 5, 10, 20], [1, 5, 10, 20], []],
+      aliveCells: [ [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [], [], [], [], [], [], [], [1]],
       generation: 0,
       cellsToMakeAlive: [],
       cellsToMakeDead: [],
@@ -233,9 +233,6 @@ class App extends Component {
     });
   }
 
-  componentDidMount() { //TODO: get better starting data for aliveCells and remove this hack.
-    this.setGridDimensions(20, 20);
-  }
 
   render() {
     return (
@@ -245,11 +242,14 @@ class App extends Component {
           <GameControls
             setGameToNextStageOfLife={this.setGameToNextStageOfLife}
             gameIsRunning={this.state.gameIsRunning}
+            rows={this.state.rows}
+            columns={this.state.columns}
+            setGridDimensions={this.setGridDimensions}
             clearGrid={this.clearGrid}
             toggleGameState={this.toggleGameState}
           />
-          <p>Generations: {this.state.generation}</p>
           <Grid rows={this.state.rows} columns={this.state.columns} aliveCells={this.state.aliveCells} toggleIsAliveState={this.toggleIsAliveState}/>
+          <p>Generations: {this.state.generation}</p>
         </div>
       </div>
     )
