@@ -11,7 +11,7 @@ class Cell extends React.Component {
 
 	render() {
 		return(
-			<td data-row={this.props.rowNumber} data-col={this.props.colNumber} onClick={(e) => this.handleClick(e)}>{this.props.isAlive ? '😀' : '☠️'}</td>
+			<td data-row={this.props.rowNumber} data-col={this.props.colNumber} onClick={(e) => this.handleClick(e)}>{this.props.isAlive ? '🌺' : '🌫'}</td>
 		)
 	}
 }
