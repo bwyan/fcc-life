@@ -25,13 +25,13 @@ class GameControls extends React.Component {
 	      <form>
 		      <label>
 		      	Rows
-		      	<Debounce time="250" handler="onChange">
+		      	<Debounce time="1000" handler="onChange">
 			      	<input type="number" defaultValue={this.props.rows} onChange={this.changeDimensions} ref={(input) => {this.rowField = input}}/>
 		      	</Debounce>
 	      	</label>
 		      <label>
 		      	Columns
-		      	<Debounce time="250" handler="onChange">
+		      	<Debounce time="1000" handler="onChange">
 			      	<input type="number" defaultValue={this.props.columns}  onChange={this.changeDimensions} ref={(input) => {this.columnField = input}}/>
 		      	</Debounce>
 		      </label>

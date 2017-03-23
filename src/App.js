@@ -62,7 +62,7 @@ class App extends Component {
       let gameInProgress = setInterval(function(){
         nextButton.click(); //this works with just about setInterval speed.
         // self.setGameToNextStageOfLife(); //this doesn't work with setInterval faster than 350 ms.
-      }, 250);
+      }, 100);
 
       this.setState({gameInProgress});
 
@@ -213,19 +213,37 @@ class App extends Component {
       // aliveCells[row].splice(aliveCells[row].indexOf(col), 1);
     });
 
-    this.setState({
-      generation,
-      aliveCells,
-      cellsToMakeAlive: [],
-      cellsToMakeDead: []
-    })
+    if (cellsToMakeAlive.length === 0 && cellsToMakeDead.length === 0) {
+      this.toggleGameState();
+    } else {
+      this.setState({
+        generation,
+        aliveCells,
+        cellsToMakeAlive: [],
+        cellsToMakeDead: []
+      })  
+    }
   }
 
   componentWillMount() {
+    const rows = 20,
+          columns = 20;
+
+    let aliveCells = [];
+
+    for (let r = 0; r < rows; r++) {
+      aliveCells.push([]);
+
+      for (let c = 0; c < columns; c++) {
+        let n = Math.floor(Math.random() * 2);
+        if (n === 1) {aliveCells[r].push(c)}
+      }
+    }
+
     this.setState({
-      rows: 20,
-      columns: 20,
-      aliveCells: [ [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [1, 5, 10, 15], [1, 5, 10, 15], [1, 5, 10, 15], [], [], [], [], [], [], [], [], [1]],
+      rows,
+      columns,
+      aliveCells,
       generation: 0,
       cellsToMakeAlive: [],
       cellsToMakeDead: [],
@@ -233,6 +251,9 @@ class App extends Component {
     });
   }
 
+  componentDidMount() {
+    this.toggleGameState();
+  }
 
   render() {
     return (
