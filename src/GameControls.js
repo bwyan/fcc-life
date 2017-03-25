@@ -1,5 +1,6 @@
 import React from 'react';
 import { Debounce } from 'react-throttle';
+import ErrorMessage from './ErrorMessage';
 
 class GameControls extends React.Component {
 	constructor() {
@@ -10,10 +11,44 @@ class GameControls extends React.Component {
 
 	changeDimensions(event) {
 		event.preventDefault();
-		const rows = this.rowField.value;
-		const columns = this.columnField.value;
+		let rows = this.rowField.value;
+		let columns = this.columnField.value;
+
+		if (rows > 50) {
+			this.rowField.value = 50;
+			rows = 50;
+
+			this.setState({
+				errorIsVisible: true,
+				message: 'Max number of rows is 50'
+			});
+
+			setTimeout(function() {
+				this.setState({errorIsVisible: false});
+			}.bind(this), 1000)
+		}
+
+		if (columns > 50) {
+			this.columnField.value = 50;
+			columns = 50;
+
+			this.setState({
+				errorIsVisible: true,
+				message: 'Max number of columns is 50'
+			});
+
+			setTimeout(function() {
+				this.setState({errorIsVisible: false});
+			}.bind(this), 1000)
+		}
 
 		this.props.setGridDimensions(rows, columns);
+	}
+
+	componentWillMount() {
+		this.setState({
+			errorIsVisible: false
+		})
 	}
 
 	render() {
@@ -26,15 +61,16 @@ class GameControls extends React.Component {
 		      <label>
 		      	Rows
 		      	<Debounce time="1000" handler="onChange">
-			      	<input type="number" defaultValue={this.props.rows} onChange={this.changeDimensions} ref={(input) => {this.rowField = input}}/>
+			      	<input type="number" min="1" max="50" defaultValue={this.props.rows} onChange={this.changeDimensions} ref={(input) => {this.rowField = input}}/>
 		      	</Debounce>
 	      	</label>
 		      <label>
 		      	Columns
 		      	<Debounce time="1000" handler="onChange">
-			      	<input type="number" defaultValue={this.props.columns}  onChange={this.changeDimensions} ref={(input) => {this.columnField = input}}/>
+			      	<input type="number" min="1" max="50" defaultValue={this.props.columns}  onChange={this.changeDimensions} ref={(input) => {this.columnField = input}}/>
 		      	</Debounce>
 		      </label>
+		      {this.state.errorIsVisible ? <ErrorMessage message={this.state.message} /> : null}
 		     </form>
 	    </div>			
 		)
