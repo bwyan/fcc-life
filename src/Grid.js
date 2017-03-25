@@ -10,7 +10,7 @@ class Grid extends React.Component {
 		}
 
 		return (
-			<table>
+			<table className="grid">
 				<tbody>
 					{rows}	
 				</tbody>

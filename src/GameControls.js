@@ -25,7 +25,7 @@ class GameControls extends React.Component {
 
 			setTimeout(function() {
 				this.setState({errorIsVisible: false});
-			}.bind(this), 1000)
+			}.bind(this), this.state.messageDuration)
 		}
 
 		if (columns > 50) {
@@ -39,7 +39,7 @@ class GameControls extends React.Component {
 
 			setTimeout(function() {
 				this.setState({errorIsVisible: false});
-			}.bind(this), 1000)
+			}.bind(this), this.state.messageDuration)
 		}
 
 		this.props.setGridDimensions(rows, columns);
@@ -47,15 +47,17 @@ class GameControls extends React.Component {
 
 	componentWillMount() {
 		this.setState({
-			errorIsVisible: false
+			errorIsVisible: false,
+			messageDuration: 5000
 		})
 	}
 
 	render() {
 	  return( 
-	    <div className="game--controls">
+	    <div className="game-controls">
+	    	<div className="container">
 	      <button id='next-button' onClick={this.props.setGameToNextStageOfLife} hidden>DEV: next</button>
-	      <button onClick={this.props.toggleGameState}>{this.props.gameIsRunning ? 'Stop' : 'Start'}</button>
+	      <button onClick={this.props.toggleGameState} className={this.props.gameIsRunning ? 'red' : 'green'}>{this.props.gameIsRunning ? 'Stop' : 'Start'}</button>
 	      <button onClick={this.props.clearGrid}>Reset</button>
 	      <form>
 		      <label>
@@ -72,6 +74,7 @@ class GameControls extends React.Component {
 		      </label>
 		      {this.state.errorIsVisible ? <ErrorMessage message={this.state.message} /> : null}
 		     </form>
+		     </div>
 	    </div>			
 		)
 	}
